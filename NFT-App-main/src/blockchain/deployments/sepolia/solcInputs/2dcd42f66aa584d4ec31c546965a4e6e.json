@@ -1,0 +1,36 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/NFT.sol": {
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\ncontract NFT {\n    address public owner;\n    address public treasuryWallet;\n    address public liquidityWallet;\n\n    uint256 public totalSupply;\n    uint256 public royaltyFee = 10; // 10% royalty fee\n\n    mapping(uint256 => address) public tokenOwners;\n    mapping(uint256 => string) public tokenURIs; // Mapping to store token URIs\n\n    event Transfer(\n        address indexed _from,\n        address indexed _to,\n        uint256 indexed _tokenId\n    );\n\n    modifier onlyOwner() {\n        require(msg.sender == owner, \"Only the owner can call this function\");\n        _;\n    }\n\n    constructor(address _treasuryWallet, address _liquidityWallet) {\n        owner = msg.sender;\n        treasuryWallet = _treasuryWallet;\n        liquidityWallet = _liquidityWallet;\n    }\n\n    function mint(string memory _tokenURI) external payable {\n        require(msg.value > 0, \"Ether value sent should be greater than 0\");\n\n        uint256 tokenId = totalSupply + 1;\n        totalSupply++;\n\n        tokenOwners[tokenId] = msg.sender;\n        tokenURIs[tokenId] = _tokenURI; // Store the token URI\n        emit Transfer(address(0), msg.sender, tokenId);\n\n        uint256 royaltyAmount = (msg.value * royaltyFee) / 100;\n        uint256 treasuryShare = (royaltyAmount * 6) / 10;\n        uint256 liquidityShare = (royaltyAmount * 4) / 10;\n\n        (bool treasurySuccess, ) = treasuryWallet.call{value: treasuryShare}(\n            \"\"\n        );\n        require(treasurySuccess, \"Treasury transfer failed\");\n\n        (bool liquiditySuccess, ) = liquidityWallet.call{value: liquidityShare}(\n            \"\"\n        );\n        require(liquiditySuccess, \"Liquidity transfer failed\");\n    }\n\n    function transfer(address _to, uint256 _tokenId) external {\n        require(\n            msg.sender == tokenOwners[_tokenId],\n            \"You do not own this token\"\n        );\n        require(_to != address(0), \"Invalid recipient address\");\n\n        tokenOwners[_tokenId] = _to;\n        emit Transfer(msg.sender, _to, _tokenId);\n    }\n}\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "evmVersion": "paris",
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}
