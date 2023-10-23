@@ -10,3 +10,4 @@ NFT sözleşmesi Sepolia test ağına dağıtıldı. Test etmek için Sepolia a�
 5.NFT'nizin başlangıç fiyatını belirledikten sonra "mint" butonuna tıklayarak işlemi tamamlayabilirsiniz.
 
 
+![image](https://github.com/mehmetygt/NFT-App-main/assets/56845461/7f87ab3b-ce29-4335-b98d-aea420eb8bff)
